@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 The ArkUI Project
+     SPDX-License-Identifier: Apache-2.0 -->
+<resources>
+    <string name="arkui_system_version" translatable="false">1.0</string>
+    <string name="arkui_build_version_date" translatable="false">ArkUI %1$s · %2$s</string>
+    <string name="arkui_update_service_pending">Update service coming soon</string>
+    <string name="arkui_update_service_pending_summary">Online updates will appear here when the service opens. You can still import a compatible local update package.</string>
+    <string name="arkui_current_version">Current version</string>
+    <string name="arkui_update_details">Update details</string>
+    <string name="arkui_version_details">Version information</string>
+    <string name="arkui_build_number">Build number</string>
+    <string name="arkui_device">Device</string>
+    <string name="arkui_show_more">View more</string>
+    <string name="arkui_show_less">Show less</string>
+    <string name="arkui_update_options">Update options</string>
+    <string name="arkui_navigate_back">Back</string>
+    <string name="arkui_other_updates">Other update packages</string>
+    <string name="arkui_update_ready">An update is available</string>
+    <string name="arkui_before_updating">Before updating</string>
+    <string name="arkui_update_reminder">Back up important data and keep enough battery power. Use an ArkUI package made for this device.</string>
+    <string name="arkui_update_not_checked">Check for an available ArkUI update.</string>
+    <string name="arkui_open_guide_unavailable">The installation guide is not available yet. Use a compatible ArkUI update package.</string>
+</resources>

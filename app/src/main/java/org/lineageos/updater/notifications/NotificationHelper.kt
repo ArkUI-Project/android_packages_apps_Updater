@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,7 +79,7 @@ class NotificationHelper(context: Context) {
             installTimestamp,
         )
         val buildInfo = appContext.getString(
-            R.string.list_build_version_date, DeviceInfoUtils.buildVersion, buildDate,
+            R.string.arkui_build_version_date, DeviceInfoUtils.buildVersion, buildDate,
         )
         val intent = PendingIntent.getActivity(
             appContext, 0,

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -159,7 +160,7 @@ class UpdateItemStateMapper(
                 if (state.canDelete) {
                     add(action(type = UpdateActionType.DELETE, enabled = !state.isBusy))
                 }
-                if (update.downloadUrl != null) {
+                if (update.downloadUrl != null && context.getString(R.string.menu_downloads_url).isNotBlank()) {
                     add(action(UpdateActionType.VIEW_DOWNLOADS))
                 }
             },
@@ -170,7 +171,7 @@ class UpdateItemStateMapper(
             isLocal = state.isFullyDownloaded,
             buildDate = StringUtil.formatBuildDate(context, update.timestamp),
             buildVersion = context.getString(
-                R.string.list_build_version,
+                R.string.header_build_version,
                 update.version,
             ),
             status = state.titleRes?.let { context.getString(it) } ?: "",

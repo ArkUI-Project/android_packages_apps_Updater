@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.lineageos.updater.controller;
@@ -497,7 +498,7 @@ public class UpdaterService extends Service {
     private void setNotificationTitle(Update update) {
         String buildDate = StringUtil.getDateLocalizedUTC(this,
                 FormatStyle.MEDIUM, update.getTimestamp());
-        String buildInfo = getString(R.string.list_build_version_date,
+        String buildInfo = getString(R.string.arkui_build_version_date,
                 update.getVersion(), buildDate);
         mNotificationStyle.setBigContentTitle(buildInfo);
         mNotificationBuilder.setContentTitle(buildInfo);

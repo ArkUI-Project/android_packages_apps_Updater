@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,6 +35,7 @@ class UpdatesViewModel(
         val isOnline: Boolean = true,
         val lastCheckedTimestamp: Long = 0L,
         val hasUpdateCheckFailed: Boolean = false,
+        val isUpdateServiceConfigured: Boolean = false,
     ) {
         val updatesCheckModel = UpdatesCheckModel(
             state = when {
@@ -43,11 +45,14 @@ class UpdatesViewModel(
                 else -> UpdatesCheckState.Idle
             },
             lastCheckedTimestamp = lastCheckedTimestamp,
-            canCheckForUpdates = isOnline && !isCheckingForUpdates,
+            canCheckForUpdates = isUpdateServiceConfigured && isOnline && !isCheckingForUpdates,
         )
     }
 
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(UiState(
+        isUpdateServiceConfigured =
+            (application as UpdaterApplication).updatesRepository.isUpdateServiceConfigured,
+    ))
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
     val uiStateLive: LiveData<UiState> = _uiState.asLiveData()
 
@@ -81,7 +86,7 @@ class UpdatesViewModel(
     }
 
     fun fetchUpdates() {
-        if (_uiState.value.isCheckingForUpdates) return
+        if (!repository.isUpdateServiceConfigured || _uiState.value.isCheckingForUpdates) return
 
         viewModelScope.launch {
             _uiState.update {

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +21,7 @@ object DeviceInfoUtils : SettingsLibDeviceInfoUtils() {
     private const val PROP_NEXT_DEVICE = "ro.updater.next_device"
     private const val PROP_RELEASE_TYPE = "ro.lineage.releasetype"
     private const val PROP_UPDATER_ALLOW_DOWNGRADING = "lineage.updater.allow_downgrading"
-    private const val PROP_UPDATER_URI = "lineage.updater.uri"
+    private const val PROP_UPDATER_URI = "ro.arkui.updater.uri"
     private const val PROP_UPDATE_RECOVERY = "persist.vendor.recovery_update"
 
     // Read-only

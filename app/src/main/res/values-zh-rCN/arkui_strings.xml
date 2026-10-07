@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 The ArkUI Project
+     SPDX-License-Identifier: Apache-2.0 -->
+<resources>
+    <string name="arkui_update_service_pending">更新服务暂未开放</string>
+    <string name="arkui_update_service_pending_summary">在线更新开放后，可在此获取新版本。现在仍可导入适用于此设备的本地更新包。</string>
+    <string name="arkui_current_version">当前版本</string>
+    <string name="arkui_update_details">更新内容</string>
+    <string name="arkui_version_details">版本信息</string>
+    <string name="arkui_build_number">版本号</string>
+    <string name="arkui_device">设备</string>
+    <string name="arkui_show_more">查看更多</string>
+    <string name="arkui_show_less">收起详情</string>
+    <string name="arkui_update_options">更新选项</string>
+    <string name="arkui_navigate_back">返回</string>
+    <string name="arkui_other_updates">其他更新包</string>
+    <string name="arkui_update_ready">发现新版本</string>
+    <string name="arkui_before_updating">更新前须知</string>
+    <string name="arkui_update_reminder">请备份重要数据并保持充足电量，使用适用于当前设备的 ArkUI 更新包。</string>
+    <string name="arkui_update_not_checked">检测是否有可用的 ArkUI 更新。</string>
+    <string name="arkui_open_guide_unavailable">安装指南暂未开放，请使用兼容的 ArkUI 更新包。</string>
+</resources>

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.lineageos.updater.UpdaterApplication
 import org.lineageos.updater.data.CheckInterval
+import org.lineageos.updater.data.source.network.UpdateServiceConfig
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
@@ -31,6 +33,7 @@ class UpdatesCheckWorker(
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
+        if (!UpdateServiceConfig.isConfigured(applicationContext)) return Result.success()
         return try {
             val application = applicationContext as UpdaterApplication
             val fetchedAt = application.updatesRepository.fetchUpdates()
@@ -55,12 +58,24 @@ class UpdatesCheckWorker(
             .build()
 
         @JvmStatic
+        fun cancelScheduledChecks(context: Context) {
+            WorkManager.getInstance(context).apply {
+                cancelUniqueWork(WORK_NAME_ONESHOT)
+                cancelUniqueWork(WORK_NAME_PERIODIC)
+            }
+        }
+
+        @JvmStatic
         fun cancelPeriodicCheck(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME_PERIODIC)
         }
 
         @JvmStatic
         fun scheduleOneshotCheck(context: Context) {
+            if (!UpdateServiceConfig.isConfigured(context)) {
+                cancelScheduledChecks(context)
+                return
+            }
             WorkManager.getInstance(context).enqueueUniqueWork(
                 WORK_NAME_ONESHOT,
                 ExistingWorkPolicy.KEEP,
@@ -72,6 +87,10 @@ class UpdatesCheckWorker(
 
         @JvmStatic
         fun schedulePeriodicCheck(context: Context) {
+            if (!UpdateServiceConfig.isConfigured(context)) {
+                cancelScheduledChecks(context)
+                return
+            }
             CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
                 val prefs =
                     (context.applicationContext as UpdaterApplication).userPreferencesRepository
@@ -87,6 +106,10 @@ class UpdatesCheckWorker(
 
         @JvmStatic
         fun reschedulePeriodicCheck(context: Context) {
+            if (!UpdateServiceConfig.isConfigured(context)) {
+                cancelScheduledChecks(context)
+                return
+            }
             CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
                 val prefs =
                     (context.applicationContext as UpdaterApplication).userPreferencesRepository

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,9 +17,11 @@ import org.lineageos.updater.data.UserPreferencesRepository
 import org.lineageos.updater.data.source.local.UpdatesDatabase
 import org.lineageos.updater.data.source.local.UpdatesLocalDataSource
 import org.lineageos.updater.data.source.network.UpdatesNetworkDataSource
+import org.lineageos.updater.data.source.network.UpdateServiceConfig
 import org.lineageos.updater.notifications.NotificationHelper
 import org.lineageos.updater.util.BatteryMonitor
 import org.lineageos.updater.util.NetworkMonitor
+import org.lineageos.updater.updatescheck.UpdatesCheckWorker
 
 class UpdaterApplication : Application() {
     private val coroutineScope = MainScope()
@@ -46,6 +49,9 @@ class UpdaterApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         notificationHelper.setUpNotificationChannels()
+        if (!UpdateServiceConfig.isConfigured(this)) {
+            UpdatesCheckWorker.cancelScheduledChecks(this)
+        }
         SpaEnvironmentFactory.reset(object : SpaEnvironment(applicationContext) {
             override val pageProviderRepository = lazy {
                 SettingsPageProviderRepository(emptyList())

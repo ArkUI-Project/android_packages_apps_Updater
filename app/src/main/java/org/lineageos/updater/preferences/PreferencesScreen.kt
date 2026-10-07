@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,6 +28,7 @@ import org.lineageos.updater.R
 import org.lineageos.updater.UpdaterApplication
 import org.lineageos.updater.data.CheckInterval
 import org.lineageos.updater.data.UserPreferencesRepository
+import org.lineageos.updater.data.source.network.UpdateServiceConfig
 import org.lineageos.updater.deviceinfo.DeviceInfoUtils
 import org.lineageos.updater.util.BatteryMonitor
 import java.io.File
@@ -51,6 +53,7 @@ private fun PreferencesContent(
     isABDevice: Boolean,
     showRecoveryUpdate: Boolean,
 ) {
+    val serviceConfigured = UpdateServiceConfig.isConfigured(LocalContext.current)
     val coroutineScope = rememberCoroutineScope()
     val abPerfMode by repository.abPerfModeFlow.collectAsStateWithLifecycle(false)
     val batteryState by batteryMonitor.batteryState.collectAsStateWithLifecycle(
@@ -65,7 +68,11 @@ private fun PreferencesContent(
     val periodicCheckEnabled by repository.periodicCheckEnabledFlow.collectAsStateWithLifecycle(true)
     var recoveryUpdateEnabled by remember { mutableStateOf(repository.getRecoveryUpdateEnabled()) }
 
-    val autoUpdatesCheckSummary = stringResource(R.string.menu_auto_updates_check_summary)
+    val autoUpdatesCheckSummary = stringResource(if (serviceConfigured) {
+        R.string.menu_auto_updates_check_summary
+    } else {
+        R.string.arkui_update_service_pending_summary
+    })
     val autoDeleteUpdatesSummary = stringResource(R.string.menu_auto_delete_updates_summary)
     val streamUpdatesSummary = stringResource(R.string.menu_stream_updates_summary)
     val meteredNetworkWarningSummary = stringResource(R.string.menu_metered_network_warning_summary)
@@ -81,8 +88,9 @@ private fun PreferencesContent(
     Category(title = stringResource(R.string.pref_category_background_sync)) {
         SwitchPreference(object : SwitchPreferenceModel {
             override val title = stringResource(R.string.menu_auto_updates_check)
+            override val changeable = { serviceConfigured }
             override val summary = { autoUpdatesCheckSummary }
-            override val checked = { periodicCheckEnabled }
+            override val checked = { serviceConfigured && periodicCheckEnabled }
             override val onCheckedChange: (Boolean) -> Unit = { value ->
                 coroutineScope.launch { repository.setPeriodicCheckEnabled(value) }
             }
@@ -90,7 +98,7 @@ private fun PreferencesContent(
 
         ListPreference(object : ListPreferenceModel {
             override val title = stringResource(R.string.menu_auto_updates_check_interval)
-            override val enabled = { periodicCheckEnabled }
+            override val enabled = { serviceConfigured && periodicCheckEnabled }
             override val options = listOf(
                 ListPreferenceOption(
                     id = CheckInterval.DAILY.ordinal,

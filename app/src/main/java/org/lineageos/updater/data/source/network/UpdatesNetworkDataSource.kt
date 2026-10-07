@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.lineageos.updater.data.source.network
@@ -8,17 +9,18 @@ import android.content.Context
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.lineageos.updater.R
 import org.lineageos.updater.deviceinfo.DeviceInfoUtils
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class UpdatesNetworkDataSource(private val context: Context) {
+    val isConfigured: Boolean
+        get() = UpdateServiceConfig.isConfigured(context)
+
     private val serverUrl: String
         get() {
-            val base = DeviceInfoUtils.updaterUri.trim().ifEmpty {
-                context.getString(R.string.updater_server_url)
-            }
+            val base = UpdateServiceConfig.endpoint(context)
+                ?: throw IOException("ArkUI update service is not configured")
             require(base.startsWith("https://")) {
                 "Update server URL must use HTTPS: $base"
             }

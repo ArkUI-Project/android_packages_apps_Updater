@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -143,6 +144,13 @@ class UpdateActionHandler(
                             R.string.blocked_update_info_url,
                             DeviceInfoUtils.device
                         )
+                        if (url.isBlank()) {
+                            showDialog(AlertDialogState(
+                                title = title,
+                                text = AnnotatedString(activity.getString(R.string.arkui_open_guide_unavailable)),
+                            ))
+                            return
+                        }
                         val messageString = String.format(
                             StringUtil.getCurrentLocale(activity),
                             activity.getString(R.string.blocked_update_dialog_message),
@@ -184,25 +192,20 @@ class UpdateActionHandler(
 
             UpdateActionType.EXPORT -> exportUpdate(update)
 
-            UpdateActionType.OPEN_GUIDE -> activity.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    activity.getString(
-                        R.string.blocked_update_info_url,
-                        DeviceInfoUtils.device,
-                    ).toUri(),
-                )
-            )
+            UpdateActionType.OPEN_GUIDE -> {
+                val url = activity.getString(R.string.blocked_update_info_url, DeviceInfoUtils.device)
+                if (url.isBlank()) {
+                    showDialog(AlertDialogState(
+                        title = activity.getString(R.string.blocked_update_dialog_title),
+                        text = AnnotatedString(activity.getString(R.string.arkui_open_guide_unavailable)),
+                    ))
+                } else activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+            }
 
-            UpdateActionType.VIEW_DOWNLOADS -> activity.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    activity.getString(
-                        R.string.menu_downloads_url,
-                        DeviceInfoUtils.device,
-                    ).toUri(),
-                )
-            )
+            UpdateActionType.VIEW_DOWNLOADS -> {
+                val url = activity.getString(R.string.menu_downloads_url, DeviceInfoUtils.device)
+                if (url.isNotBlank()) activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+            }
 
             UpdateActionType.REBOOT ->
                 activity.getSystemService(PowerManager::class.java).reboot(null)
@@ -250,7 +253,7 @@ class UpdateActionHandler(
             update.timestamp,
         )
         val buildInfoText = activity.getString(
-            R.string.list_build_version_date,
+            R.string.arkui_build_version_date,
             update.version,
             buildDate,
         )

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,6 +27,9 @@ class UpdatesRepository(
     private val networkDataSource: UpdatesNetworkDataSource,
     private val localDataSource: UpdatesLocalDataSource,
 ) {
+    val isUpdateServiceConfigured: Boolean
+        get() = networkDataSource.isConfigured
+
     fun observeLocalUpdates(): Flow<List<Update>> = localDataSource.observeUpdates()
 
     /**
@@ -33,11 +37,13 @@ class UpdatesRepository(
      * notification if new updates are found. Callers observe [observeLocalUpdates] for results —
      * Room only emits when the stored data actually changes.
      *
-     * @return the timestamp of the fetch, or null if skipped due to no network.
+     * @return the timestamp of the fetch, or null if the service or network is unavailable.
      * @throws IOException on network or HTTP errors.
      * @throws SerializationException if the response cannot be parsed.
      */
     suspend fun fetchUpdates(): Long? {
+        // Return before touching cached packages or recording a successful check.
+        if (!isUpdateServiceConfigured) return null
         if (!networkMonitor.currentNetworkState.isOnline) return null
 
         val localUpdates = withContext(Dispatchers.IO) {
