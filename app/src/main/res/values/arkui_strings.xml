@@ -2,10 +2,11 @@
 <!-- SPDX-FileCopyrightText: 2026 The ArkUI Project
      SPDX-License-Identifier: Apache-2.0 -->
 <resources>
-    <string name="arkui_system_version" translatable="false">1.0</string>
-    <string name="arkui_build_version_date" translatable="false">ArkUI %1$s · %2$s</string>
+    <string name="arkui_build_version_date" translatable="false">%1$s · %2$s</string>
     <string name="arkui_update_service_pending">Update service coming soon</string>
     <string name="arkui_update_service_pending_summary">Online updates will appear here when the service opens. You can still import a compatible local update package.</string>
+    <string name="arkui_unofficial_update">Unofficial build</string>
+    <string name="arkui_unofficial_update_summary">Official update channels are only available on official builds. You can import a compatible local update package.</string>
     <string name="arkui_current_version">Current version</string>
     <string name="arkui_update_details">Update details</string>
     <string name="arkui_version_details">Version information</string>

@@ -18,6 +18,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,6 +42,8 @@ class UpdatesCheckWorker(
                 application.appStateRepository.setLastCheckedTimestamp(fetchedAt)
             }
             Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e(TAG, "Update check failed", e)
             Result.retry()
@@ -78,7 +81,7 @@ class UpdatesCheckWorker(
             }
             WorkManager.getInstance(context).enqueueUniqueWork(
                 WORK_NAME_ONESHOT,
-                ExistingWorkPolicy.KEEP,
+                ExistingWorkPolicy.REPLACE,
                 OneTimeWorkRequestBuilder<UpdatesCheckWorker>()
                     .setConstraints(networkConstraints)
                     .build(),

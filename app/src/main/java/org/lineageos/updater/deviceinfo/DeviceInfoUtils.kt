@@ -8,6 +8,7 @@ package org.lineageos.updater.deviceinfo
 
 import android.os.Build
 import android.os.SystemProperties
+import org.lineageos.updater.data.UpdateChannel
 import com.android.settingslib.DeviceInfoUtils as SettingsLibDeviceInfoUtils
 
 object DeviceInfoUtils : SettingsLibDeviceInfoUtils() {
@@ -18,8 +19,9 @@ object DeviceInfoUtils : SettingsLibDeviceInfoUtils() {
     private const val PROP_BUILD_VERSION = "org.arkui.build.version"
     private const val PROP_BUILD_VERSION_INCREMENTAL = "ro.build.version.incremental"
     private const val PROP_DEVICE = "ro.lineage.device"
-    private const val PROP_NEXT_DEVICE = "ro.updater.next_device"
     private const val PROP_RELEASE_TYPE = "org.arkui.releasetype"
+    private const val PROP_CHANNEL = "org.arkui.channel"
+    private const val PROP_CHANNEL_NUMBER = "org.arkui.channel.number"
     private const val PROP_UPDATER_ALLOW_DOWNGRADING = "lineage.updater.allow_downgrading"
     private const val PROP_UPDATER_URI = "ro.arkui.updater.uri"
     private const val PROP_UPDATE_RECOVERY = "persist.vendor.recovery_update"
@@ -41,13 +43,38 @@ object DeviceInfoUtils : SettingsLibDeviceInfoUtils() {
     val buildVersionIncremental: String = SystemProperties.get(PROP_BUILD_VERSION_INCREMENTAL, "")
 
     @JvmStatic
-    val device: String = SystemProperties.get(PROP_NEXT_DEVICE, SystemProperties.get(PROP_DEVICE))
+    val device: String = SystemProperties.get(PROP_DEVICE)
 
     @JvmStatic
     val isABDevice: Boolean = SystemProperties.getBoolean(PROP_AB_DEVICE, false)
 
     @JvmStatic
     val releaseType: String = SystemProperties.get(PROP_RELEASE_TYPE)
+
+    val isOfficialBuild: Boolean = releaseType == "OFFICIAL"
+
+    val romVersion: String = SystemProperties.get("ro.arkui.version")
+
+    @JvmStatic
+    val buildName: String = SystemProperties.get("ro.lineage.version")
+
+    private val channelNumberValue = SystemProperties.get(PROP_CHANNEL_NUMBER)
+    val installedChannelNumber: Int? = channelNumberValue.toIntOrNull()
+
+    val installedChannel: UpdateChannel? = if (isOfficialBuild) {
+        UpdateChannel.fromStorageValue(SystemProperties.get(PROP_CHANNEL))?.takeIf {
+            (channelNumberValue.isEmpty() || installedChannelNumber != null) &&
+                it.releaseLabel(installedChannelNumber) != null
+        }
+    } else {
+        null
+    }
+
+    val releaseLabel: String = if (isOfficialBuild) {
+        installedChannel?.releaseLabel(installedChannelNumber).orEmpty()
+    } else {
+        releaseType
+    }
 
     // Mutable at runtime
     @JvmStatic

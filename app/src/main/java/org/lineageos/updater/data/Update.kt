@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,6 +32,7 @@ data class Update(
     val timestamp: Long = 0,
     val type: String? = null,
     val version: String = "",
+    val channel: String? = null,
 ) {
     fun withAvailableOnline(v: Boolean) = copy(isAvailableOnline = v)
     fun withDownloadId(v: String) = copy(downloadId = v)
@@ -76,6 +78,7 @@ data class Update(
         private var timestamp: Long = 0,
         private var type: String? = null,
         private var version: String = "",
+        private var channel: String? = null,
     ) {
         constructor(update: Update) : this(
             update.isAvailableOnline, update.downloadId, update.downloadUrl,
@@ -84,7 +87,7 @@ data class Update(
             update.payloadMetadataOffset, update.payloadMetadataSize, update.payloadOffset,
             update.payloadSize, update.payloadPropertiesOffset, update.payloadPropertiesSize,
             update.progress, update.speed, update.status, update.timestamp, update.type,
-            update.version,
+            update.version, update.channel,
         )
 
         fun setAvailableOnline(v: Boolean) = apply { isAvailableOnline = v }
@@ -110,11 +113,12 @@ data class Update(
         fun setTimestamp(v: Long) = apply { timestamp = v }
         fun setType(v: String?) = apply { type = v }
         fun setVersion(v: String) = apply { version = v }
+        fun setChannel(v: String?) = apply { channel = v }
         fun build() = Update(
             isAvailableOnline, downloadId, downloadUrl, eta, file, fileSize,
             isFinalizing, installProgress, name, osPatchLevel, osSdkLevel, payloadMetadataOffset,
             payloadMetadataSize, payloadOffset, payloadSize, payloadPropertiesOffset,
-            payloadPropertiesSize, progress, speed, status, timestamp, type, version,
+            payloadPropertiesSize, progress, speed, status, timestamp, type, version, channel,
         )
     }
 

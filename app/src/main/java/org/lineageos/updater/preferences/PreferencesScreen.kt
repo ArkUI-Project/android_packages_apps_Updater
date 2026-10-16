@@ -68,10 +68,10 @@ private fun PreferencesContent(
     val periodicCheckEnabled by repository.periodicCheckEnabledFlow.collectAsStateWithLifecycle(true)
     var recoveryUpdateEnabled by remember { mutableStateOf(repository.getRecoveryUpdateEnabled()) }
 
-    val autoUpdatesCheckSummary = stringResource(if (serviceConfigured) {
-        R.string.menu_auto_updates_check_summary
-    } else {
-        R.string.arkui_update_service_pending_summary
+    val autoUpdatesCheckSummary = stringResource(when {
+        !DeviceInfoUtils.isOfficialBuild -> R.string.arkui_unofficial_update_summary
+        serviceConfigured -> R.string.menu_auto_updates_check_summary
+        else -> R.string.arkui_update_service_pending_summary
     })
     val autoDeleteUpdatesSummary = stringResource(R.string.menu_auto_delete_updates_summary)
     val streamUpdatesSummary = stringResource(R.string.menu_stream_updates_summary)
@@ -86,6 +86,8 @@ private fun PreferencesContent(
     }
 
     Category(title = stringResource(R.string.pref_category_background_sync)) {
+        UpdateChannelPreference(repository)
+
         SwitchPreference(object : SwitchPreferenceModel {
             override val title = stringResource(R.string.menu_auto_updates_check)
             override val changeable = { serviceConfigured }

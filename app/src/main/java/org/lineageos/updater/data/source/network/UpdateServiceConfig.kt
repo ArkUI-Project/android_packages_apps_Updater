@@ -16,5 +16,6 @@ object UpdateServiceConfig {
             .ifEmpty { context.getString(R.string.updater_server_url).trim() }
             .takeIf { it.isNotEmpty() }
 
-    fun isConfigured(context: Context): Boolean = endpoint(context) != null
+    fun isConfigured(context: Context): Boolean =
+        DeviceInfoUtils.installedChannel != null && endpoint(context) != null
 }

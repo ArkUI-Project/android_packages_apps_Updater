@@ -1,48 +1,44 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package org.lineageos.updater.data.source.network
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import org.lineageos.updater.data.Update
+import org.lineageos.updater.data.UpdateChannel
 import org.lineageos.updater.misc.Constants
-
-// Commented out fields below are available in production, but not needed in runtime.
-// If you wish to uncomment any of them, please update the README.md to indicate that.
 
 @Suppress("PROVIDED_RUNTIME_TOO_LOW")
 @Serializable
-@JsonIgnoreUnknownKeys
 data class NetworkUpdate(
-    // @SerialName("date") val date: String,
     @SerialName("datetime") val datetime: Long,
     @SerialName("files") val files: List<NetworkUpdateFile>,
     @SerialName("type") val type: String,
+    @SerialName("channel") val channel: String,
+    @SerialName("channel_number") val channelNumber: Int?,
+    @SerialName("build_number") val buildNumber: String,
     @SerialName("version") val version: String,
-)
+) {
+    val buildName: String
+        get() {
+            val label = UpdateChannel.fromStorageValue(channel)?.releaseLabel(channelNumber)
+            return "ArkUI-$version-$type-$label-$buildNumber"
+        }
+}
 
 @Suppress("PROVIDED_RUNTIME_TOO_LOW")
 @Serializable
-@JsonIgnoreUnknownKeys
 data class NetworkUpdateFile(
-    // @SerialName("date") val date: String? = null,
-    // @SerialName("datetime") val datetime: Long? = null,
     @SerialName("filename") val filename: String,
-    // @SerialName("filepath") val filepath: String,
-    @SerialName("os_patch_level") val osPatchLevel: String? = null,
-    @SerialName("os_sdk_level") val osSdkLevel: Int? = null,
+    @SerialName("os_patch_level") val osPatchLevel: String,
+    @SerialName("os_sdk_level") val osSdkLevel: Int,
     @SerialName("ota_property_files") val otaPropertyFiles: String? = null,
-    // @SerialName("sha1") val sha1: String,
     @SerialName("sha256") val sha256: String,
     @SerialName("size") val size: Long,
-    // @SerialName("type") val type: String? = null,
     @SerialName("url") val url: String,
 )
 
@@ -72,11 +68,12 @@ fun NetworkUpdate.toUpdate(): Update {
         name = file.filename,
         timestamp = datetime,
         type = type,
+        channel = channel,
         fileSize = file.size,
         downloadUrl = file.url,
-        version = version,
+        version = buildName,
         osPatchLevel = file.osPatchLevel,
-        osSdkLevel = file.osSdkLevel ?: 0,
+        osSdkLevel = file.osSdkLevel,
         payloadMetadataOffset = payloadMetadataRange?.offset,
         payloadMetadataSize = payloadMetadataRange?.size,
         payloadOffset = payloadRange?.offset,

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +18,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  *
  * Use [UpdatesLocalDataSource] to interact with data.
  */
-@Database(entities = [UpdateEntity::class], version = 4, exportSchema = true)
+@Database(entities = [UpdateEntity::class], version = 5, exportSchema = true)
 abstract class UpdatesDatabase : RoomDatabase() {
     abstract fun updateDao(): UpdateDao
 
@@ -76,6 +77,12 @@ abstract class UpdatesDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `updates` ADD COLUMN `channel` TEXT")
+            }
+        }
+
         @JvmStatic
         fun getInstance(context: Context): UpdatesDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
@@ -83,7 +90,7 @@ abstract class UpdatesDatabase : RoomDatabase() {
                 UpdatesDatabase::class.java,
                 "updates.db"
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 .build()
                 .also { instance = it }
         }

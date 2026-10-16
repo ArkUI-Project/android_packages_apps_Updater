@@ -87,8 +87,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.lineageos.updater.R
+import org.lineageos.updater.UpdaterApplication
 import org.lineageos.updater.UpdatesViewModel
 import org.lineageos.updater.deviceinfo.DeviceInfoUtils
+import org.lineageos.updater.preferences.UpdateChannelPreference
 import org.lineageos.updater.updates.UpdateList
 import org.lineageos.updater.updates.action.UpdateAction
 import org.lineageos.updater.updates.action.UpdateActionType
@@ -185,6 +187,7 @@ fun ArkuiUpdatesScreen(
                             Text(
                                 text = featured?.actions?.primary?.type?.title(context)
                                     ?: stringResource(when {
+                                        !DeviceInfoUtils.isOfficialBuild -> R.string.arkui_unofficial_update
                                         pending -> R.string.arkui_update_service_pending
                                         uiState.isCheckingForUpdates -> R.string.checking_for_updates
                                         else -> R.string.check_for_updates
@@ -205,6 +208,9 @@ fun ArkuiUpdatesScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 UpdateHero()
+                UpdateChannelPreference(
+                    (context.applicationContext as UpdaterApplication).userPreferencesRepository
+                )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
@@ -213,7 +219,7 @@ fun ArkuiUpdatesScreen(
                             color = colors.primary,
                         )
                         Text(
-                            featured?.buildVersion ?: "ArkUI ${stringResource(R.string.arkui_system_version)}",
+                            featured?.buildVersion ?: DeviceInfoUtils.buildName,
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.semantics { heading() },
@@ -257,7 +263,7 @@ fun ArkuiUpdatesScreen(
                     InfoRow(stringResource(R.string.build_date), StringUtil.formatBuildDate(context, DeviceInfoUtils.buildDateTimestamp))
                     InfoRow(stringResource(R.string.security_update), StringUtil.formatSecurityPatch(context, DeviceInfoUtils.buildSecurityPatch))
                     if (moreExpanded) {
-                        InfoRow(stringResource(R.string.arkui_build_number), Build.DISPLAY)
+                        InfoRow(stringResource(R.string.arkui_build_number), DeviceInfoUtils.buildVersionIncremental)
                         InfoRow(stringResource(R.string.arkui_device), Build.MODEL)
                     }
                     TextButton(
@@ -338,10 +344,11 @@ private fun UpdateHero() {
                 colorFilter = ColorFilter.tint(ink),
             )
             Text(
-                stringResource(R.string.arkui_system_version), fontSize = 64.sp,
+                DeviceInfoUtils.romVersion, fontSize = 64.sp,
                 lineHeight = 68.sp, letterSpacing = (-2).sp,
                 fontWeight = FontWeight.Medium, color = ink,
             )
+            Text(DeviceInfoUtils.releaseLabel, style = MaterialTheme.typography.titleMedium, color = ink)
             Surface(shape = CircleShape, color = colors.surface.copy(alpha = 0.45f)) {
                 Text(
                     stringResource(R.string.header_android_version, DeviceInfoUtils.androidVersion),
@@ -358,6 +365,7 @@ private fun UpdateServiceStatus(state: UpdatesViewModel.UiState) {
     val colors = MaterialTheme.colorScheme
     val pending = !state.isUpdateServiceConfigured
     val title = stringResource(when {
+        !DeviceInfoUtils.isOfficialBuild -> R.string.arkui_unofficial_update
         pending -> R.string.arkui_update_service_pending
         state.isCheckingForUpdates -> R.string.checking_for_updates
         !state.isOnline -> R.string.check_your_internet_connection
@@ -379,7 +387,11 @@ private fun UpdateServiceStatus(state: UpdatesViewModel.UiState) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
             }
             Text(
-                stringResource(if (pending) R.string.arkui_update_service_pending_summary else R.string.updates_zero_state_description),
+                stringResource(when {
+                    !DeviceInfoUtils.isOfficialBuild -> R.string.arkui_unofficial_update_summary
+                    pending -> R.string.arkui_update_service_pending_summary
+                    else -> R.string.updates_zero_state_description
+                }),
                 style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant,
             )
             if (!pending && state.lastCheckedTimestamp > 0) {

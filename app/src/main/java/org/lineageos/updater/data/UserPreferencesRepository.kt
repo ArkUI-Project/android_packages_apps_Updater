@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: 2026 The ArkUI Project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,6 +40,7 @@ private object UserPreferencesKeys {
     val METERED_NETWORK_WARNING = booleanPreferencesKey("metered_network_warning")
     val PERIODIC_CHECK_ENABLED = booleanPreferencesKey("periodic_check_enabled")
     val STREAM_UPDATES = booleanPreferencesKey("stream_updates")
+    val UPDATE_CHANNEL = stringPreferencesKey("update_channel")
 }
 
 class UserPreferencesRepository(context: Context) {
@@ -46,6 +48,22 @@ class UserPreferencesRepository(context: Context) {
     private val userPreferences = appContext.userPreferencesDataStore
     private val userPreferencesFlow = userPreferences.data.catch { exception ->
         if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+
+    val updateChannelFlow: Flow<UpdateChannel?> = userPreferencesFlow.map { preferences ->
+        DeviceInfoUtils.installedChannel?.let { installed ->
+            UpdateChannel.fromStorageValue(preferences[UserPreferencesKeys.UPDATE_CHANNEL]) ?: installed
+        }
+    }
+
+    suspend fun getUpdateChannel(): UpdateChannel? = updateChannelFlow.first()
+
+    suspend fun setUpdateChannel(channel: UpdateChannel) {
+        if (DeviceInfoUtils.installedChannel == null) return
+        if (getUpdateChannel() == channel) return
+        userPreferences.edit { it[UserPreferencesKeys.UPDATE_CHANNEL] = channel.storageValue }
+        AppStateRepository(appContext).setLastCheckedTimestamp(0)
+        UpdatesCheckWorker.scheduleOneshotCheck(appContext)
     }
 
     val abPerfModeFlow: Flow<Boolean> = userPreferencesFlow.map { preferences ->

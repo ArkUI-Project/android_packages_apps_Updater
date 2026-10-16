@@ -38,6 +38,10 @@
     <string name="menu_preferences">系统更新首选项</string>
     <string name="preferences_summary">同步、下载和安装</string>
     <string name="check_for_updates">检查更新</string>
+    <string name="update_channel_title">更新渠道</string>
+    <string name="update_channel_stable">稳定版（Stable）</string>
+    <string name="update_channel_beta">公测版（Beta）</string>
+    <string name="update_channel_alpha">内测版（Alpha）</string>
     <string name="checking_for_updates">正在检查更新</string>
     <string name="check_your_internet_connection">请检查您的网络连接</string>
     <string name="updates_check_failed">更新检查失败，请稍后重试。</string>

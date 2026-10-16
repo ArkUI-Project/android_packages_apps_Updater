@@ -35,7 +35,7 @@ fun DeviceInfoBanner(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val locale = remember(context, configuration.locales) { StringUtil.getCurrentLocale(context) }
-    val buildVersion = remember { DeviceInfoUtils.buildVersion }
+    val buildVersion = remember { DeviceInfoUtils.buildName }
     val androidVersion = remember { DeviceInfoUtils.androidVersion }
     val buildDate = remember(locale) {
         DateFormat.getInstanceForSkeleton("MMMd", locale)
