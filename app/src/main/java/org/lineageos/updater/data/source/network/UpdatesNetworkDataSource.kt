@@ -38,6 +38,9 @@ class UpdatesNetworkDataSource(private val context: Context) {
     fun fetchUpdates(): List<NetworkUpdate> {
         val request = Request.Builder()
             .url(serverUrl)
+            .header("X-ArkUI-Release-Type", DeviceInfoUtils.releaseType)
+            .header("X-ArkUI-Build-Version", DeviceInfoUtils.buildVersion)
+            .header("X-ArkUI-SDK", DeviceInfoUtils.sdkLevel.toString())
             .build()
 
         val responseBody = client.newCall(request).execute().use { response ->
