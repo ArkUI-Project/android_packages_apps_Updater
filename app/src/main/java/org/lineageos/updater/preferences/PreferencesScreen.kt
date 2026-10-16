@@ -68,6 +68,27 @@ private fun PreferencesContent(
     val periodicCheckEnabled by repository.periodicCheckEnabledFlow.collectAsStateWithLifecycle(true)
     var recoveryUpdateEnabled by remember { mutableStateOf(repository.getRecoveryUpdateEnabled()) }
 
+    val autoUpdatesCheckTitle = stringResource(R.string.menu_auto_updates_check)
+    val checkIntervalTitle = stringResource(R.string.menu_auto_updates_check_interval)
+    val autoDeleteTitle = stringResource(R.string.menu_auto_delete_updates)
+    val streamUpdatesTitle = stringResource(R.string.menu_stream_updates)
+    val meteredNetworkWarningTitle = stringResource(R.string.menu_metered_network_warning)
+    val abPerfModeTitle = stringResource(R.string.menu_ab_perf_mode)
+    val updateRecoveryTitle = stringResource(R.string.menu_update_recovery)
+    val checkIntervalOptions = listOf(
+        ListPreferenceOption(
+            id = CheckInterval.DAILY.ordinal,
+            text = stringResource(R.string.time_unit_day),
+        ),
+        ListPreferenceOption(
+            id = CheckInterval.WEEKLY.ordinal,
+            text = stringResource(R.string.time_unit_week),
+        ),
+        ListPreferenceOption(
+            id = CheckInterval.MONTHLY.ordinal,
+            text = stringResource(R.string.time_unit_month),
+        ),
+    )
     val autoUpdatesCheckSummary = stringResource(when {
         !DeviceInfoUtils.isOfficialBuild -> R.string.arkui_unofficial_update_summary
         serviceConfigured -> R.string.menu_auto_updates_check_summary
@@ -89,7 +110,7 @@ private fun PreferencesContent(
         UpdateChannelPreference(repository)
 
         SwitchPreference(object : SwitchPreferenceModel {
-            override val title = stringResource(R.string.menu_auto_updates_check)
+            override val title = autoUpdatesCheckTitle
             override val changeable = { serviceConfigured }
             override val summary = { autoUpdatesCheckSummary }
             override val checked = { serviceConfigured && periodicCheckEnabled }
@@ -99,22 +120,9 @@ private fun PreferencesContent(
         })
 
         ListPreference(object : ListPreferenceModel {
-            override val title = stringResource(R.string.menu_auto_updates_check_interval)
+            override val title = checkIntervalTitle
             override val enabled = { serviceConfigured && periodicCheckEnabled }
-            override val options = listOf(
-                ListPreferenceOption(
-                    id = CheckInterval.DAILY.ordinal,
-                    text = stringResource(R.string.time_unit_day),
-                ),
-                ListPreferenceOption(
-                    id = CheckInterval.WEEKLY.ordinal,
-                    text = stringResource(R.string.time_unit_week),
-                ),
-                ListPreferenceOption(
-                    id = CheckInterval.MONTHLY.ordinal,
-                    text = stringResource(R.string.time_unit_month),
-                ),
-            )
+            override val options = checkIntervalOptions
             override val selectedId = selectedCheckInterval
             override val onIdSelected: (Int) -> Unit = { id ->
                 val interval = CheckInterval.entries.getOrElse(id) { CheckInterval.default }
@@ -126,7 +134,7 @@ private fun PreferencesContent(
     Category(title = stringResource(R.string.pref_category_download_install)) {
         if (isABDevice) {
             SwitchPreference(object : SwitchPreferenceModel {
-                override val title = stringResource(R.string.menu_stream_updates)
+                override val title = streamUpdatesTitle
                 override val summary = { streamUpdatesSummary }
                 override val checked = { streamUpdates }
                 override val onCheckedChange: (Boolean) -> Unit = { value ->
@@ -135,7 +143,7 @@ private fun PreferencesContent(
             })
         } else {
             SwitchPreference(object : SwitchPreferenceModel {
-                override val title = stringResource(R.string.menu_auto_delete_updates)
+                override val title = autoDeleteTitle
                 override val summary = { autoDeleteUpdatesSummary }
                 override val checked = { autoDelete }
                 override val onCheckedChange: (Boolean) -> Unit = { value ->
@@ -145,7 +153,7 @@ private fun PreferencesContent(
         }
 
         SwitchPreference(object : SwitchPreferenceModel {
-            override val title = stringResource(R.string.menu_metered_network_warning)
+            override val title = meteredNetworkWarningTitle
             override val summary = { meteredNetworkWarningSummary }
             override val checked = { meteredNetworkWarning }
             override val onCheckedChange: (Boolean) -> Unit = { value ->
@@ -155,7 +163,7 @@ private fun PreferencesContent(
 
         if (isABDevice) {
             SwitchPreference(object : SwitchPreferenceModel {
-                override val title = stringResource(R.string.menu_ab_perf_mode)
+                override val title = abPerfModeTitle
                 override val summary = {
                     if (batteryState.isAcCharging) {
                         abPerfModeChargingSummary
@@ -173,7 +181,7 @@ private fun PreferencesContent(
 
         if (showRecoveryUpdate) {
             SwitchPreference(object : SwitchPreferenceModel {
-                override val title = stringResource(R.string.menu_update_recovery)
+                override val title = updateRecoveryTitle
                 override val summary = { updateRecoverySummary }
                 override val checked = { recoveryUpdateEnabled }
                 override val onCheckedChange: (Boolean) -> Unit = { value ->

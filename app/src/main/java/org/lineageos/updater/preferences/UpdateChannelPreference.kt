@@ -27,19 +27,21 @@ fun UpdateChannelPreference(repository: UserPreferencesRepository) {
     val selectedChannel by repository.updateChannelFlow.collectAsStateWithLifecycle(installed)
     val channel = selectedChannel ?: return
     val coroutineScope = rememberCoroutineScope()
+    val preferenceTitle = stringResource(R.string.update_channel_title)
+    val channelOptions = UpdateChannel.entries.map { option ->
+        ListPreferenceOption(
+            id = option.ordinal,
+            text = stringResource(option.label),
+        )
+    }
     val selected = remember(channel) {
         object : IntState {
             override val intValue = channel.ordinal
         }
     }
     ListPreference(object : ListPreferenceModel {
-        override val title = stringResource(R.string.update_channel_title)
-        override val options = UpdateChannel.entries.map { option ->
-            ListPreferenceOption(
-                id = option.ordinal,
-                text = stringResource(option.label),
-            )
-        }
+        override val title = preferenceTitle
+        override val options = channelOptions
         override val selectedId = selected
         override val onIdSelected: (Int) -> Unit = { id ->
             val newChannel = UpdateChannel.entries.getOrNull(id)
